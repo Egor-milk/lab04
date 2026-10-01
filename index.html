@@ -1,0 +1,1266 @@
+<!DOCTYPE html>
+<html lang="ru" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Choco Croco OS - Powered by OS</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Canvas Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+        :root {
+            --bg-primary: #18110b;
+            --bg-secondary: #261a12;
+            --bg-tertiary: #342419;
+            --text-primary: #f5e6d8;
+            --text-secondary: #c2a893;
+            --accent-green: #38a169;
+            --accent-green-hover: #2f855a;
+            --accent-gold: #d4af37;
+            --accent-gold-light: #f6e05e;
+            --accent-red: #e53e3e;
+            --border-color: #422e1f;
+            --card-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.4);
+            --toast-bg: #2d1e15;
+            --term-bg: #0d0906;
+        }
+
+        .theme-mokko {
+            --bg-primary: #f7f0ea;
+            --bg-secondary: #ffffff;
+            --bg-tertiary: #efe3d8;
+            --text-primary: #3c2415;
+            --text-secondary: #785a44;
+            --accent-green: #2e7d32;
+            --accent-green-hover: #1b5e20;
+            --accent-gold: #c59b27;
+            --accent-gold-light: #d69e2e;
+            --accent-red: #c53030;
+            --border-color: #e0d0c1;
+            --card-shadow: 0 10px 25px -5px rgba(60, 36, 21, 0.08), 0 8px 10px -6px rgba(60, 36, 21, 0.04);
+            --toast-bg: #ffffff;
+            --term-bg: #231710;
+        }
+
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+            transition: background-color 0.4s ease, color 0.4s ease;
+        }
+
+        .code-font {
+            font-family: 'Fira Code', monospace;
+        }
+
+        .custom-border {
+            border-color: var(--border-color);
+        }
+
+        .bg-panel {
+            background-color: var(--bg-secondary);
+        }
+
+        .bg-panel-elevated {
+            background-color: var(--bg-tertiary);
+        }
+
+        .text-muted {
+            color: var(--text-secondary);
+        }
+
+        .btn-croco {
+            background-color: var(--accent-green);
+            color: #ffffff;
+            transition: all 0.2s ease;
+        }
+
+        .btn-croco:hover {
+            background-color: var(--accent-green-hover);
+            transform: translateY(-1px);
+        }
+
+        .text-gold {
+            color: var(--accent-gold);
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--bg-primary);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--border-color);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--accent-gold);
+        }
+
+        /* Animations */
+        @keyframes pulseGlow {
+            0%, 100% { opacity: 0.4; filter: drop-shadow(0 0 8px var(--accent-green)); }
+            50% { opacity: 0.9; filter: drop-shadow(0 0 15px var(--accent-gold)); }
+        }
+
+        .animate-glow {
+            animation: pulseGlow 3s infinite ease-in-out;
+        }
+
+        @keyframes scanLaser {
+            0% { top: 0%; opacity: 0.8; }
+            50% { opacity: 1; }
+            100% { top: 100%; opacity: 0.8; }
+        }
+
+        .laser-line {
+            position: absolute;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, var(--accent-green), var(--accent-gold), transparent);
+            box-shadow: 0 0 12px var(--accent-green);
+            animation: scanLaser 2s infinite ease-in-out alternate;
+        }
+
+        .tab-btn.active {
+            background-color: var(--bg-tertiary);
+            color: var(--accent-gold);
+            border-bottom: 2px solid var(--accent-gold);
+        }
+
+        /* Thermometer Meter Slider Custom Styling */
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 22px;
+            width: 22px;
+            border-radius: 50%;
+            background: var(--accent-gold);
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(0,0,0,0.5);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col selection:bg-amber-700 selection:text-white">
+
+    <!-- Header / Navbar -->
+    <header class="sticky top-0 z-40 backdrop-blur-md bg-panel/80 border-b custom-border transition-colors duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16 sm:h-20">
+
+                <!-- Logo & Branding -->
+                <div class="flex items-center space-x-3 cursor-pointer" onclick="switchTab('overview')">
+                    <div class="relative w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br from-amber-800 via-amber-900 to-emerald-900 flex items-center justify-center shadow-lg border border-amber-600/30">
+                        <i data-lucide="shield-check" class="w-6 h-6 sm:w-7 sm:h-7 text-amber-400"></i>
+                        <span class="absolute -bottom-1 -right-1 text-xs">🐊</span>
+                    </div>
+                    <div>
+                        <div class="flex items-center space-x-2">
+                            <h1 class="font-extrabold text-lg sm:text-xl tracking-tight text-gold">Choco Croco OS</h1>
+                            <span id="vipBadge" class="hidden px-2 py-0.5 text-[10px] uppercase tracking-wider font-bold rounded-full bg-amber-500/20 text-amber-400 border border-amber-500/40">VIP Koka</span>
+                        </div>
+                        <p class="text-xs text-muted font-medium">Powered by <span class="underline decoration-amber-600/50">OS</span> v3.0</p>
+                    </div>
+                </div>
+
+                <!-- Desktop Navigation Tabs -->
+                <nav class="hidden md:flex items-center space-x-1 bg-panel-elevated p-1.5 rounded-xl border custom-border">
+                    <button onclick="switchTab('overview')" id="tab-overview" class="tab-btn active px-4 py-2 rounded-lg text-sm font-semibold flex items-center space-x-2 transition-all">
+                        <i data-lucide="layout-dashboard" class="w-4 h-4"></i>
+                        <span>Обзор OS</span>
+                    </button>
+                    <button onclick="switchTab('store')" id="tab-store" class="tab-btn px-4 py-2 rounded-lg text-sm font-semibold flex items-center space-x-2 transition-all">
+                        <i data-lucide="shopping-bag" class="w-4 h-4"></i>
+                        <span>Koka Store</span>
+                    </button>
+                    <button onclick="switchTab('verify')" id="tab-verify" class="tab-btn px-4 py-2 rounded-lg text-sm font-semibold flex items-center space-x-2 transition-all">
+                        <i data-lucide="user-check" class="w-4 h-4"></i>
+                        <span>Верификация</span>
+                    </button>
+                    <button onclick="switchTab('terminal')" id="tab-terminal" class="tab-btn px-4 py-2 rounded-lg text-sm font-semibold flex items-center space-x-2 transition-all">
+                        <i data-lucide="terminal" class="w-4 h-4"></i>
+                        <span>Choco CLI</span>
+                    </button>
+                </nav>
+
+                <!-- Header Actions (Theme, Audio) -->
+                <div class="flex items-center space-x-2 sm:space-x-3">
+                    <!-- Sound Toggle -->
+                    <button onclick="toggleAudio()" id="audioBtn" title="Переключить звук" class="p-2.5 rounded-xl bg-panel-elevated border custom-border text-muted hover:text-gold transition-colors">
+                        <i data-lucide="volume-2" id="audioIcon" class="w-5 h-5"></i>
+                    </button>
+
+                    <!-- Theme Toggle Switch -->
+                    <button onclick="toggleTheme()" id="themeBtn" class="px-3.5 py-2 rounded-xl bg-panel-elevated border custom-border flex items-center space-x-2 text-xs font-semibold hover:border-amber-600/50 transition-all shadow-sm">
+                        <span id="themeIcon">🐊</span>
+                        <span id="themeLabel">Тема: Чоко Кроко</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile Navigation Sub-bar -->
+        <div class="md:hidden flex items-center justify-around bg-panel border-t custom-border px-2 py-1.5 overflow-x-auto">
+            <button onclick="switchTab('overview')" id="tab-mob-overview" class="flex flex-col items-center p-1.5 text-xs text-muted font-medium">
+                <i data-lucide="layout-dashboard" class="w-4 h-4 mb-0.5"></i>
+                <span>Обзор</span>
+            </button>
+            <button onclick="switchTab('store')" id="tab-mob-store" class="flex flex-col items-center p-1.5 text-xs text-muted font-medium">
+                <i data-lucide="shopping-bag" class="w-4 h-4 mb-0.5"></i>
+                <span>Store</span>
+            </button>
+            <button onclick="switchTab('verify')" id="tab-mob-verify" class="flex flex-col items-center p-1.5 text-xs text-muted font-medium">
+                <i data-lucide="user-check" class="w-4 h-4 mb-0.5"></i>
+                <span>Аутентификация</span>
+            </button>
+            <button onclick="switchTab('terminal')" id="tab-mob-terminal" class="flex flex-col items-center p-1.5 text-xs text-muted font-medium">
+                <i data-lucide="terminal" class="w-4 h-4 mb-0.5"></i>
+                <span>CLI</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+
+        <!-- ================= TAB 1: OVERVIEW ================= -->
+        <section id="view-overview" class="space-y-8 animate-fadeIn">
+            <!-- Hero Banner -->
+            <div class="relative overflow-hidden rounded-3xl bg-panel border custom-border p-6 sm:p-10 shadow-2xl">
+                <div class="absolute -right-10 -bottom-10 w-72 h-72 bg-amber-600/10 rounded-full blur-3xl pointer-events-none"></div>
+                <div class="absolute -left-10 -top-10 w-72 h-72 bg-emerald-600/10 rounded-full blur-3xl pointer-events-none"></div>
+
+                <div class="relative z-10 max-w-3xl space-y-4">
+                    <div class="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-semibold">
+                        <span class="animate-pulse">●</span>
+                        <span>Релиз v3.0-STABLE — Без шпионов Play Market</span>
+                    </div>
+                    <h2 class="text-3xl sm:text-5xl font-black tracking-tight leading-tight">
+                        Национальная ОС <br class="hidden sm:inline"/>
+                        <span class="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 via-amber-200 to-emerald-400">
+                            Choco Croco OS
+                        </span>
+                    </h2>
+                    <p class="text-sm sm:text-base text-muted leading-relaxed">
+                        Полностью независимая шоколадно-крокодиловая экосистема, созданная на замену проприетарным магазинам. Полная анонимность, защита от слежки Google и строгая верификация пользователей.
+                    </p>
+                    <div class="pt-2 flex flex-wrap gap-3">
+                        <button onclick="switchTab('store')" class="btn-croco px-6 py-3 rounded-xl font-bold text-sm flex items-center space-x-2 shadow-lg">
+                            <i data-lucide="shopping-bag" class="w-5 h-5"></i>
+                            <span>Открыть Koka Store</span>
+                        </button>
+                        <button onclick="switchTab('verify')" class="px-6 py-3 rounded-xl bg-panel-elevated border custom-border font-bold text-sm hover:border-amber-500/40 transition-all flex items-center space-x-2">
+                            <i data-lucide="shield-check" class="w-5 h-5 text-amber-400"></i>
+                            <span>Пройти Биометрию</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Features Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+                <!-- Card 1 -->
+                <div class="bg-panel p-5 rounded-2xl border custom-border space-y-3 hover:border-amber-600/40 transition-all">
+                    <div class="w-12 h-12 rounded-xl bg-amber-500/10 text-amber-400 flex items-center justify-center">
+                        <i data-lucide="shield-off" class="w-6 h-6"></i>
+                    </div>
+                    <h3 class="font-bold text-lg">Anti-Google Shield</h3>
+                    <p class="text-xs text-muted leading-relaxed">100% изоляция от телеметрии Play Market и проприетарных сервисов Big Tech.</p>
+                </div>
+
+                <!-- Card 2 -->
+                <div class="bg-panel p-5 rounded-2xl border custom-border space-y-3 hover:border-amber-600/40 transition-all">
+                    <div class="w-12 h-12 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center">
+                        <i data-lucide="thermometer-snowflake" class="w-6 h-6"></i>
+                    </div>
+                    <h3 class="font-bold text-lg">Защита</h3>
+                    <p class="text-xs text-muted leading-relaxed">Вход в Кока Стор только после проверки биометрии и замеров температуры (36.6 °C).</p>
+                </div>
+
+                <!-- Card 3 -->
+                <div class="bg-panel p-5 rounded-2xl border custom-border space-y-3 hover:border-amber-600/40 transition-all">
+                    <div class="w-12 h-12 rounded-xl bg-amber-500/10 text-amber-400 flex items-center justify-center">
+                        <i data-lucide="palette" class="w-6 h-6"></i>
+                    </div>
+                    <h3 class="font-bold text-lg">Двойной Движок</h3>
+                    <p class="text-xs text-muted leading-relaxed">Переключайтесь между темным шоколадом «Чоко Кроко» и нежным мокко «Попко Мокко».</p>
+                </div>
+
+                <!-- Card 4 -->
+                <div class="bg-panel p-5 rounded-2xl border custom-border space-y-3 hover:border-amber-600/40 transition-all">
+                    <div class="w-12 h-12 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center">
+                        <i data-lucide="cpu" class="w-6 h-6"></i>
+                    </div>
+                    <h3 class="font-bold text-lg">OS</h3>
+                    <p class="text-xs text-muted leading-relaxed">Ядро с динамической частотой шевеления и реактивным апскейлингом производительности.</p>
+                </div>
+            </div>
+
+            <!-- Live Status Telemetry Bar -->
+            <div class="bg-panel rounded-2xl border custom-border p-6 space-y-4">
+                <div class="flex items-center justify-between border-b custom-border pb-3">
+                    <div class="flex items-center space-x-2">
+                        <i data-lucide="activity" class="w-5 h-5 text-emerald-400 animate-pulse"></i>
+                        <h3 class="font-bold text-base">Телеметрия Шевелюн Core</h3>
+                    </div>
+                    <span class="text-xs code-font text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-full border border-emerald-500/20">
+                        STATUS: ACTIVE & FREE
+                    </span>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <!-- Gauge 1 -->
+                    <div class="bg-panel-elevated p-4 rounded-xl border custom-border space-y-2">
+                        <div class="flex justify-between text-xs text-muted font-medium">
+                            <span>Загрузка Ядра</span>
+                            <span id="cpuUsageVal" class="code-font text-amber-400">42%</span>
+                        </div>
+                        <div class="w-full bg-amber-950/40 h-2.5 rounded-full overflow-hidden">
+                            <div id="cpuProgressBar" class="bg-gradient-to-r from-amber-500 to-emerald-500 h-full w-[42%] transition-all duration-500"></div>
+                        </div>
+                    </div>
+
+                    <!-- Gauge 2 -->
+                    <div class="bg-panel-elevated p-4 rounded-xl border custom-border space-y-2">
+                        <div class="flex justify-between text-xs text-muted font-medium">
+                            <span>Заблокировано шпионов Google</span>
+                            <span id="googleBlockedVal" class="code-font text-emerald-400">1,488 шт.</span>
+                        </div>
+                        <div class="w-full bg-amber-950/40 h-2.5 rounded-full overflow-hidden">
+                            <div class="bg-emerald-500 h-full w-[100%] animate-pulse"></div>
+                        </div>
+                    </div>
+
+                    <!-- Gauge 3 -->
+                    <div class="bg-panel-elevated p-4 rounded-xl border custom-border space-y-2">
+                        <div class="flex justify-between text-xs text-muted font-medium">
+                            <span>Температура</span>
+                            <span id="rectalTempOverviewVal" class="code-font text-gold">36.6 °C</span>
+                        </div>
+                        <div class="w-full bg-amber-950/40 h-2.5 rounded-full overflow-hidden">
+                            <div class="bg-amber-400 h-full w-[65%]"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- ================= TAB 2: KOKA STORE ================= -->
+        <section id="view-store" class="hidden space-y-6 animate-fadeIn">
+            <!-- Store Header & Search -->
+            <div class="bg-panel rounded-2xl border custom-border p-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div>
+                    <div class="flex items-center space-x-3">
+                        <h2 class="text-2xl font-black text-gold">Кока Стор (Koka Store)</h2>
+                        <span class="px-2.5 py-0.5 text-xs font-bold bg-emerald-500/20 text-emerald-400 rounded-full border border-emerald-500/30">
+                            v3.0 Official
+                        </span>
+                    </div>
+                    <p class="text-xs text-muted mt-1">Официальный магазин проверенных приложений без цензуры Play Market</p>
+                </div>
+
+                <!-- Search Input -->
+                <div class="relative w-full md:w-72">
+                    <i data-lucide="search" class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted"></i>
+                    <input type="text" id="storeSearchInput" oninput="filterStoreApps()" placeholder="Поиск в Кока Стор..." class="w-full pl-9 pr-4 py-2.5 rounded-xl bg-panel-elevated border custom-border text-sm focus:outline-none focus:border-amber-500/50 transition-all">
+                </div>
+            </div>
+
+            <!-- Category Filter Tabs -->
+            <div class="flex items-center space-x-2 overflow-x-auto pb-2 scrollbar-none">
+                <button onclick="filterCategory('all')" id="cat-all" class="cat-btn bg-panel-elevated border border-amber-500/40 text-gold px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all">
+                    Все софты
+                </button>
+                <button onclick="filterCategory('system')" id="cat-system" class="cat-btn bg-panel border custom-border text-muted hover:text-gold px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all">
+                    Системные
+                </button>
+                <button onclick="filterCategory('health')" id="cat-health" class="cat-btn bg-panel border custom-border text-muted hover:text-gold px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all">
+                    Градусники & Здоровье
+                </button>
+                <button onclick="filterCategory('security')" id="cat-security" class="cat-btn bg-panel border custom-border text-muted hover:text-gold px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all">
+                    Безопасность
+                </button>
+                <button onclick="filterCategory('memes')" id="cat-memes" class="cat-btn bg-panel border custom-border text-muted hover:text-gold px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all">
+                    Мемы & Шевеление
+                </button>
+            </div>
+
+            <!-- Apps Grid -->
+            <div id="storeAppsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+                <!-- App cards generated dynamically by Javascript -->
+            </div>
+        </section>
+
+
+        <!-- ================= TAB 3: VERIFICATION ================= -->
+        <section id="view-verify" class="hidden space-y-6 animate-fadeIn">
+            <!-- Verification Card -->
+            <div class="max-w-3xl mx-auto bg-panel rounded-3xl border custom-border p-6 sm:p-8 space-y-8 shadow-2xl relative overflow-hidden">
+                <div class="border-b custom-border pb-5">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h2 class="text-2xl font-black text-gold flex items-center gap-2">
+                                <i data-lucide="shield-check" class="w-7 h-7 text-emerald-400"></i>
+                                Верификация Koka Store VIP
+                            </h2>
+                            <p class="text-xs text-muted mt-1">Обязательная процедура для получения доступа к заблокированным функциям</p>
+                        </div>
+                        <span id="verifyStepIndicator" class="text-xs font-bold code-font text-amber-400 bg-amber-500/10 px-3 py-1 rounded-full border border-amber-500/30">
+                            Шаг 1 из 3
+                        </span>
+                    </div>
+                </div>
+
+                <!-- STEP 1: Biometric & ID Dropzone -->
+                <div id="verifyStep1" class="space-y-4">
+                    <h3 class="font-bold text-base flex items-center gap-2">
+                        <span>1. Биометрический снимок & Паспорт РФ</span>
+                    </h3>
+                    <p class="text-xs text-muted">Загрузите фото паспорта и пройдите сканирование контуров для валидации в Koka Store.</p>
+
+                    <div id="scannerBox" class="relative border-2 border-dashed custom-border hover:border-amber-500/50 rounded-2xl p-8 text-center bg-panel-elevated transition-all cursor-pointer group flex flex-col items-center justify-center min-h-[220px]" onclick="triggerBioScan()">
+                        <div id="scannerLaser" class="hidden laser-line"></div>
+
+                        <div id="scanIdleContent" class="space-y-3">
+                            <div class="w-16 h-16 rounded-2xl bg-amber-500/10 text-amber-400 flex items-center justify-center mx-auto group-hover:scale-110 transition-transform">
+                                <i data-lucide="camera" class="w-8 h-8"></i>
+                            </div>
+                            <div>
+                                <p class="font-bold text-sm">Нажмите для биометрического сканирования</p>
+                                <p class="text-xs text-muted mt-1">Поддерживается автоматическое определение шевелюн-контуров</p>
+                            </div>
+                        </div>
+
+                        <!-- Scanning Active Overlay -->
+                        <div id="scanActiveContent" class="hidden space-y-3">
+                            <div class="relative w-24 h-24 mx-auto rounded-full border-2 border-emerald-400 flex items-center justify-center overflow-hidden bg-emerald-950/20">
+                                <i data-lucide="user" class="w-12 h-12 text-emerald-400 animate-pulse"></i>
+                                <div class="absolute inset-0 border border-amber-400/50 rounded-full animate-ping"></div>
+                            </div>
+                            <p id="scanStatusText" class="text-xs font-bold code-font text-emerald-400">Инициализация биометрии...</p>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-between items-center pt-2">
+                        <span id="scanResultBadge" class="text-xs text-muted font-medium">Статус снимок: <span class="text-amber-400">Ожидание</span></span>
+                        <button onclick="goToVerifyStep(2)" id="btnStep1Next" disabled class="opacity-50 cursor-not-allowed btn-croco px-5 py-2.5 rounded-xl text-xs font-bold flex items-center space-x-2">
+                            <span>Далее: Замер Температуры</span>
+                            <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- STEP 2: Rectal Thermometer Tool -->
+                <div id="verifyStep2" class="hidden space-y-6">
+                    <div>
+                        <h3 class="font-bold text-base">2. Замер Температуры</h3>
+                        <p class="text-xs text-muted mt-1">Отрегулируйте градусник до идеальной нормы ядра (36.6 °C - 37.2 °C).</p>
+                    </div>
+
+                    <!-- Thermometer Graphic & Slider -->
+                    <div class="bg-panel-elevated p-6 rounded-2xl border custom-border space-y-6">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-12 h-12 rounded-xl bg-amber-500/10 text-gold flex items-center justify-center">
+                                    <i data-lucide="thermometer" class="w-6 h-6"></i>
+                                </div>
+                                <div>
+                                    <div class="text-xs text-muted">Текущее показание</div>
+                                    <div id="tempDisplayVal" class="text-3xl font-black code-font text-gold">36.6 °C</div>
+                                </div>
+                            </div>
+
+                            <span id="tempStatusBadge" class="px-3 py-1 text-xs font-bold rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+                                Норма Шевеления
+                            </span>
+                        </div>
+
+                        <!-- Interactive Range Slider -->
+                        <div class="space-y-2">
+                            <input type="range" id="tempSlider" min="35.0" max="40.0" step="0.1" value="36.6" oninput="updateTempSlider(this.value)" class="w-full h-3 bg-panel rounded-lg appearance-none cursor-pointer accent-amber-500">
+                            <div class="flex justify-between text-[11px] text-muted code-font">
+                                <span>35.0 °C (Охлаждение)</span>
+                                <span>36.6 °C (Шоколад)</span>
+                                <span>40.0 °C (Перегрев)</span>
+                            </div>
+                        </div>
+
+                        <!-- Dynamic Comment Box -->
+                        <div id="tempFeedbackBox" class="p-4 rounded-xl bg-panel border custom-border text-xs leading-relaxed text-muted">
+                            💡 <span id="tempFeedbackText">Идеальная температура! Система работает в стандартном шоколадном режиме.</span>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-between items-center pt-2">
+                        <button onclick="goToVerifyStep(1)" class="px-4 py-2.5 rounded-xl bg-panel-elevated border custom-border text-xs font-bold">
+                            Назад
+                        </button>
+                        <button onclick="goToVerifyStep(3)" class="btn-croco px-5 py-2.5 rounded-xl text-xs font-bold flex items-center space-x-2">
+                            <span>Перейти к Финалу</span>
+                            <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- STEP 3: Final Verification Action -->
+                <div id="verifyStep3" class="hidden space-y-6 text-center py-4">
+                    <div class="w-20 h-20 mx-auto rounded-3xl bg-gradient-to-br from-amber-500 to-emerald-600 flex items-center justify-center text-white shadow-xl">
+                        <i data-lucide="award" class="w-10 h-10"></i>
+                    </div>
+
+                    <div class="space-y-2 max-w-md mx-auto">
+                        <h3 class="text-xl font-black text-gold">Все параметры успешно подтверждены!</h3>
+                        <p class="text-xs text-muted">
+                            Биометрический контур совпадает, а температура зафиксирована в допустимом диапазоне. Нажмите кнопку ниже для получения статуса Koka VIP.
+                        </p>
+                    </div>
+
+                    <div id="verifyingProgressBox" class="hidden max-w-sm mx-auto space-y-2">
+                        <div class="w-full bg-panel-elevated h-3 rounded-full overflow-hidden border custom-border">
+                            <div id="verifyProgressBar" class="bg-gradient-to-r from-amber-500 to-emerald-500 h-full w-0 transition-all duration-300"></div>
+                        </div>
+                        <p id="verifyProgressText" class="text-xs code-font text-muted">Генерация сертификата...</p>
+                    </div>
+
+                    <button onclick="completeFinalVerification()" id="btnFinalVerify" class="btn-croco px-8 py-3.5 rounded-2xl font-black text-sm shadow-xl inline-flex items-center space-x-2">
+                        <i data-lucide="check-circle" class="w-5 h-5"></i>
+                        <span>Пройти Верификацию</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- ================= TAB 4: CHOCO CLI TERMINAL ================= -->
+        <section id="view-terminal" class="hidden space-y-6 animate-fadeIn">
+            <div class="bg-panel rounded-3xl border custom-border overflow-hidden shadow-2xl">
+                <!-- Terminal Title Bar -->
+                <div class="bg-panel-elevated px-4 py-3 border-b custom-border flex items-center justify-between">
+                    <div class="flex items-center space-x-2">
+                        <div class="flex space-x-1.5">
+                            <span class="w-3 h-3 rounded-full bg-red-500 inline-block"></span>
+                            <span class="w-3 h-3 rounded-full bg-yellow-500 inline-block"></span>
+                            <span class="w-3 h-3 rounded-full bg-green-500 inline-block"></span>
+                        </div>
+                        <span class="text-xs code-font font-bold text-muted ml-2">choco-terminal@pisyun_shevelyunos:~</span>
+                    </div>
+
+                    <span class="text-[10px] code-font text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
+                        BASH / CHOCO-SHELL v3.0
+                    </span>
+                </div>
+
+                <!-- Terminal Output Container -->
+                <div id="termOutput" class="p-4 sm:p-6 min-h-[360px] max-h-[480px] overflow-y-auto code-font text-xs sm:text-sm space-y-2 leading-relaxed" style="background-color: var(--term-bg);">
+                    <div class="text-emerald-400">
+                      ____ _                     ____                          ___  ____  <br/>
+                     / ___| |__   ___   ___ ___ / ___|_ __ ___   ___ ___      / _ \/ ___| <br/>
+                    | |   | '_ \ / _ \ / __/ _ \ |   | '__/ _ \ / __/ _ \    | | | \___ \ <br/>
+                    | |___| | | | (_) | (_| (_) | |___| | | (_) | (_| (_) |  | |_| |___) |<br/>
+                     \____|_| |_|\___/ \___\___/ \____|_| |_|\___/ \___\___/    \___/|____/ <br/>
+                    </div>
+                    <p class="text-muted">Choco Croco OS Shell [Powered by OS].</p>
+                    <p class="text-muted">Введите <span class="text-gold font-bold">help</span> для списка доступных команд.</p>
+                    <hr class="border-amber-900/30 my-2"/>
+                </div>
+
+                <!-- Terminal Input Form -->
+                <form onsubmit="handleTermSubmit(event)" class="border-t custom-border bg-panel-elevated px-4 py-3 flex items-center space-x-2">
+                    <span class="text-emerald-400 code-font font-bold">choco-croco$&nbsp;</span>
+                    <input type="text" id="termInput" autocomplete="off" placeholder="Введите команду..." class="flex-grow bg-transparent code-font text-xs sm:text-sm focus:outline-none text-gold">
+                    <button type="submit" class="text-xs bg-amber-500/20 hover:bg-amber-500/30 text-gold px-3 py-1.5 rounded-lg border border-amber-500/30 font-bold transition-all">
+                        Run
+                    </button>
+                </form>
+            </div>
+        </section>
+    </main>
+
+    <!-- App Details / Launch Modal -->
+    <div id="appModal" class="fixed inset-0 z-50 hidden bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-panel rounded-3xl border custom-border max-w-lg w-full p-6 space-y-6 shadow-2xl relative animate-fadeIn">
+            <button onclick="closeAppModal()" class="absolute top-4 right-4 text-muted hover:text-gold p-1">
+                <i data-lucide="x" class="w-6 h-6"></i>
+            </button>
+
+            <div class="flex items-center space-x-4">
+                <div id="modalAppIconBox" class="w-16 h-16 rounded-2xl bg-amber-500/10 text-amber-400 flex items-center justify-center border custom-border">
+                    <!-- Icon -->
+                </div>
+                <div>
+                    <h3 id="modalAppTitle" class="text-xl font-bold text-gold">Название Софта</h3>
+                    <div class="flex items-center space-x-2 text-xs text-muted mt-1">
+                        <span id="modalAppCategory">Категория</span>
+                        <span>•</span>
+                        <span id="modalAppSize">14.8 MB</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal Dynamic Interactive Canvas/View -->
+            <div id="modalInteractiveArea" class="bg-panel-elevated p-4 rounded-2xl border custom-border min-h-[140px] flex flex-col items-center justify-center text-center space-y-3">
+                <!-- Injected via JS -->
+            </div>
+
+            <div class="flex justify-end space-x-3">
+                <button onclick="closeAppModal()" class="px-5 py-2.5 rounded-xl bg-panel-elevated border custom-border text-xs font-bold">
+                    Закрыть
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dynamic Toast Notification Container -->
+    <div id="toastContainer" class="fixed bottom-5 right-5 z-50 flex flex-col space-y-2 pointer-events-none"></div>
+
+
+    <script>
+        // Global State
+        const state = {
+            theme: 'choco', // 'choco' | 'mokko'
+            audioMuted: false,
+            isVipVerified: false,
+            currentTab: 'overview',
+            currentTemp: 36.6,
+            scanCompleted: false,
+            blockedGoogleCount: 1488,
+            cpuUsage: 42,
+            installedApps: new Set(['scanner']),
+            apps: [
+                {
+                    id: 'scanner',
+                    title: 'Кроко-Сканер 3000',
+                    category: 'health',
+                    categoryName: 'Градусники & Здоровье',
+                    icon: 'scan',
+                    rating: '4.9',
+                    size: '12.4 MB',
+                    badge: 'Koka Exclusive',
+                    desc: 'Сканирование окружающих предметов на предмет присутствия биометрических контуров и слежки.',
+                    installed: true
+                },
+                {
+                    id: 'rectal_pro',
+                    title: 'Градусник PRO',
+                    category: 'health',
+                    categoryName: 'Градусники & Здоровье',
+                    icon: 'thermometer',
+                    rating: '5.0',
+                    size: '8.1 MB',
+                    badge: 'Verified',
+                    desc: 'Мониторинг внутренней температуры устройства и владельца с точностью до 0.01 °C.',
+                    installed: false
+                },
+                {
+                    id: 'launcher',
+                    title: 'Шевелюн Launcher EX',
+                    category: 'system',
+                    categoryName: 'Системные',
+                    icon: 'smartphone',
+                    rating: '4.8',
+                    size: '34.2 MB',
+                    badge: 'Top',
+                    desc: 'Главный рабочий стол с физикой шевеления иконок и виджетами состояния ядра.',
+                    installed: false
+                },
+                {
+                    id: 'shield',
+                    title: 'Антипроприетарный Щит',
+                    category: 'security',
+                    categoryName: 'Безопасность',
+                    icon: 'shield-alert',
+                    rating: '5.0',
+                    size: '18.9 MB',
+                    badge: 'Top',
+                    desc: 'Блокировка всех запросов от сервисов Play Market, Google Services и сторонней телеметрии.',
+                    installed: false
+                },
+                {
+                    id: 'player',
+                    title: 'Попко-Мокко Плеер',
+                    category: 'memes',
+                    categoryName: 'Мемы & Шевеление',
+                    icon: 'music',
+                    rating: '4.7',
+                    size: '22.0 MB',
+                    badge: 'Koka Exclusive',
+                    desc: 'Аудиоплеер для воспроизведения шоколадных басов и треков шевелюна.',
+                    installed: false
+                },
+                {
+                    id: 'vpn',
+                    title: 'Croco-VPN Exclusiv',
+                    category: 'security',
+                    categoryName: 'Безопасность',
+                    icon: 'lock',
+                    rating: '4.9',
+                    size: '15.6 MB',
+                    badge: 'Verified',
+                    desc: 'Зашифрованное соединение сквозь защищенный шоколадный туннель.',
+                    installed: false
+                }
+            ]
+        };
+
+        // Web Audio Synthesizer for Interactive Sound Effects
+        const AudioFX = {
+            ctx: null,
+            init() {
+                if(!this.ctx) {
+                    this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+                }
+            },
+            play(freq = 440, type = 'sine', duration = 0.1, vol = 0.1) {
+                if(state.audioMuted) return;
+                try {
+                    this.init();
+                    const osc = this.ctx.createOscillator();
+                    const gain = this.ctx.createGain();
+                    osc.type = type;
+                    osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
+                    gain.gain.setValueAtTime(vol, this.ctx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.0001, this.ctx.currentTime + duration);
+                    osc.connect(gain);
+                    gain.connect(this.ctx.destination);
+                    osc.start();
+                    osc.stop(this.ctx.currentTime + duration);
+                } catch(e) {}
+            },
+            playClick() { this.play(600, 'sine', 0.05, 0.08); },
+            playSuccess() {
+                this.play(523, 'triangle', 0.1, 0.1);
+                setTimeout(() => this.play(659, 'triangle', 0.1, 0.1), 80);
+                setTimeout(() => this.play(783, 'triangle', 0.2, 0.12), 160);
+            },
+            playScanBeep() { this.play(1200, 'sawtooth', 0.04, 0.05); }
+        };
+
+        // Tab Navigation Switcher
+        function switchTab(tabId) {
+            AudioFX.playClick();
+            state.currentTab = tabId;
+
+            // Hide all tab views
+            ['overview', 'store', 'verify', 'terminal'].forEach(id => {
+                const el = document.getElementById(`view-${id}`);
+                const btn = document.getElementById(`tab-${id}`);
+                const mobBtn = document.getElementById(`tab-mob-${id}`);
+
+                if (el) el.classList.add('hidden');
+                if (btn) btn.classList.remove('active');
+                if (mobBtn) mobBtn.classList.remove('text-amber-400');
+            });
+
+            // Show selected view
+            const selectedView = document.getElementById(`view-${tabId}`);
+            const selectedBtn = document.getElementById(`tab-${tabId}`);
+            const selectedMobBtn = document.getElementById(`tab-mob-${tabId}`);
+
+            if (selectedView) selectedView.classList.remove('hidden');
+            if (selectedBtn) selectedBtn.classList.add('active');
+            if (selectedMobBtn) selectedMobBtn.classList.add('text-amber-400');
+
+            if (tabId === 'store') renderStoreApps();
+        }
+
+        // Theme Engine (Чоко Кроко vs Попко Мокко)
+        function toggleTheme() {
+            AudioFX.playClick();
+            const body = document.body;
+            const themeLabel = document.getElementById('themeLabel');
+            const themeIcon = document.getElementById('themeIcon');
+
+            if (state.theme === 'choco') {
+                state.theme = 'mokko';
+                body.classList.add('theme-mokko');
+                themeLabel.innerText = 'Тема: Попко Мокко';
+                themeIcon.innerText = '☕';
+                showToast('Тема переключена на «Попко Мокко» ☕');
+            } else {
+                state.theme = 'choco';
+                body.classList.remove('theme-mokko');
+                themeLabel.innerText = 'Тема: Чоко Кроко';
+                themeIcon.innerText = '🐊';
+                showToast('Тема переключена на «Чоко Кроко» 🐊');
+            }
+        }
+
+        // Sound Toggle
+        function toggleAudio() {
+            state.audioMuted = !state.audioMuted;
+            const icon = document.getElementById('audioIcon');
+            if (state.audioMuted) {
+                icon.setAttribute('data-lucide', 'volume-x');
+                showToast('Звуковые эффекты выключены');
+            } else {
+                icon.setAttribute('data-lucide', 'volume-2');
+                AudioFX.playSuccess();
+                showToast('Звуковые эффекты включены 🔊');
+            }
+            lucide.createIcons();
+        }
+
+        // Render Store Apps Grid
+        let currentCategoryFilter = 'all';
+
+        function filterCategory(cat) {
+            AudioFX.playClick();
+            currentCategoryFilter = cat;
+
+            document.querySelectorAll('.cat-btn').forEach(b => {
+                b.classList.remove('bg-panel-elevated', 'border-amber-500/40', 'text-gold');
+                b.classList.add('bg-panel', 'custom-border', 'text-muted');
+            });
+
+            const activeBtn = document.getElementById(`cat-${cat}`);
+            if (activeBtn) {
+                activeBtn.classList.remove('bg-panel', 'text-muted');
+                activeBtn.classList.add('bg-panel-elevated', 'border-amber-500/40', 'text-gold');
+            }
+
+            renderStoreApps();
+        }
+
+        function filterStoreApps() {
+            renderStoreApps();
+        }
+
+        function renderStoreApps() {
+            const grid = document.getElementById('storeAppsGrid');
+            const searchVal = document.getElementById('storeSearchInput').value.toLowerCase();
+
+            const filtered = state.apps.filter(app => {
+                const matchesCat = currentCategoryFilter === 'all' || app.category === currentCategoryFilter;
+                const matchesSearch = app.title.toLowerCase().includes(searchVal) || app.desc.toLowerCase().includes(searchVal);
+                return matchesCat && matchesSearch;
+            });
+
+            grid.innerHTML = '';
+
+            if (filtered.length === 0) {
+                grid.innerHTML = `
+                    <div class="col-span-full py-12 text-center text-muted space-y-2">
+                        <i data-lucide="package-search" class="w-10 h-10 mx-auto text-amber-500/40"></i>
+                        <p class="font-bold text-sm">Приложения не найдены</p>
+                    </div>
+                `;
+                lucide.createIcons();
+                return;
+            }
+
+            filtered.forEach(app => {
+                const isInstalled = state.installedApps.has(app.id);
+                const card = document.createElement('div');
+                card.className = 'bg-panel rounded-2xl border custom-border p-5 space-y-4 flex flex-col justify-between hover:border-amber-600/40 transition-all shadow-lg';
+
+                card.innerHTML = `
+                    <div class="space-y-3">
+                        <div class="flex items-start justify-between">
+                            <div class="w-12 h-12 rounded-xl bg-amber-500/10 text-gold flex items-center justify-center border custom-border">
+                                <i data-lucide="${app.icon}" class="w-6 h-6"></i>
+                            </div>
+                            <span class="px-2.5 py-0.5 text-[10px] font-extrabold tracking-wider uppercase rounded-full bg-amber-500/15 text-amber-400 border border-amber-500/30">
+                                ${app.badge}
+                            </span>
+                        </div>
+
+                        <div>
+                            <h3 class="font-bold text-base text-gold">${app.title}</h3>
+                            <div class="flex items-center space-x-2 text-xs text-muted mt-0.5">
+                                <span class="flex items-center text-amber-400 font-bold">★ ${app.rating}</span>
+                                <span>•</span>
+                                <span>${app.size}</span>
+                            </div>
+                        </div>
+
+                        <p class="text-xs text-muted leading-relaxed">${app.desc}</p>
+                    </div>
+
+                    <div class="pt-2 border-t custom-border space-y-2">
+                        <!-- Progress Bar (hidden by default) -->
+                        <div id="progressBox-${app.id}" class="hidden space-y-1">
+                            <div class="w-full bg-panel-elevated h-2 rounded-full overflow-hidden">
+                                <div id="progressBar-${app.id}" class="bg-gradient-to-r from-amber-500 to-emerald-500 h-full w-0 transition-all duration-200"></div>
+                            </div>
+                            <span class="text-[10px] code-font text-muted">Загрузка файла...</span>
+                        </div>
+
+                        ${isInstalled ? `
+                            <div class="flex space-x-2">
+                                <button onclick="launchAppModal('${app.id}')" class="flex-grow btn-croco py-2.5 rounded-xl text-xs font-bold flex items-center justify-center space-x-1.5">
+                                    <i data-lucide="play" class="w-4 h-4"></i>
+                                    <span>Запустить</span>
+                                </button>
+                                <span class="px-3 py-2 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-xs font-bold flex items-center">
+                                    ✓
+                                </span>
+                            </div>
+                        ` : `
+                            <button onclick="installApp('${app.id}')" id="btnInstall-${app.id}" class="w-full bg-panel-elevated border custom-border hover:border-amber-500/40 text-gold py-2.5 rounded-xl text-xs font-bold flex items-center justify-center space-x-1.5 transition-all">
+                                <i data-lucide="download" class="w-4 h-4"></i>
+                                <span>Установить</span>
+                            </button>
+                        `}
+                    </div>
+                `;
+
+                grid.appendChild(card);
+            });
+
+            lucide.createIcons();
+        }
+
+        // Simulated App Download & Installation
+        function installApp(appId) {
+            AudioFX.playClick();
+
+            if (!state.isVipVerified) {
+                showToast('⚠️ Требуется проходимость верификации Koka VIP!', 'error');
+                switchTab('verify');
+                return;
+            }
+
+            const btn = document.getElementById(`btnInstall-${appId}`);
+            const progressBox = document.getElementById(`progressBox-${appId}`);
+            const progressBar = document.getElementById(`progressBar-${appId}`);
+
+            if (btn) btn.classList.add('hidden');
+            if (progressBox) progressBox.classList.remove('hidden');
+
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += 20;
+                if (progressBar) progressBar.style.width = `${progress}%`;
+                AudioFX.playScanBeep();
+
+                if (progress >= 100) {
+                    clearInterval(interval);
+                    state.installedApps.add(appId);
+                    AudioFX.playSuccess();
+                    showToast(`Приложение "${state.apps.find(a=>a.id===appId).title}" успешно установлено! 🎉`);
+                    renderStoreApps();
+                }
+            }, 300);
+        }
+
+        // Step Navigation for Verification Wizard
+        function goToVerifyStep(step) {
+            AudioFX.playClick();
+            [1, 2, 3].forEach(s => {
+                const el = document.getElementById(`verifyStep${s}`);
+                if (el) el.classList.add('hidden');
+            });
+
+            const targetStep = document.getElementById(`verifyStep${step}`);
+            if (targetStep) targetStep.classList.remove('hidden');
+
+            document.getElementById('verifyStepIndicator').innerText = `Шаг ${step} из 3`;
+        }
+
+        // Biometric Scanning Action
+        function triggerBioScan() {
+            if (state.scanCompleted) return;
+
+            AudioFX.playClick();
+            document.getElementById('scanIdleContent').classList.add('hidden');
+            document.getElementById('scanActiveContent').classList.remove('hidden');
+            document.getElementById('scannerLaser').classList.remove('hidden');
+
+            const statusText = document.getElementById('scanStatusText');
+            const messages = [
+                'Анализ контуров...',
+                'Проверка паспорта РФ на подлинность...',
+                'Детекция активности...',
+                'Биометрия распознана! 100% Соответствие.'
+            ];
+
+            let idx = 0;
+            const scanInterval = setInterval(() => {
+                statusText.innerText = messages[idx];
+                AudioFX.playScanBeep();
+                idx++;
+
+                if (idx >= messages.length) {
+                    clearInterval(scanInterval);
+                    state.scanCompleted = true;
+                    AudioFX.playSuccess();
+
+                    document.getElementById('scanResultBadge').innerHTML = 'Статус снимка: <span class="text-emerald-400 font-bold">Успешно пройдено ✓</span>';
+                    const nextBtn = document.getElementById('btnStep1Next');
+                    nextBtn.removeAttribute('disabled');
+                    nextBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                    showToast('Биометрический контур распознан! 🐊');
+                }
+            }, 800);
+        }
+
+        // Rectal Thermometer Slider Update
+        function updateTempSlider(val) {
+            state.currentTemp = parseFloat(val).toFixed(1);
+            document.getElementById('tempDisplayVal').innerText = `${state.currentTemp} °C`;
+            document.getElementById('rectalTempOverviewVal').innerText = `${state.currentTemp} °C`;
+
+            const feedback = document.getElementById('tempFeedbackText');
+            const badge = document.getElementById('tempStatusBadge');
+
+            if (state.currentTemp < 36.0) {
+                feedback.innerText = '❄️ Температура ниже нормы. Требуется кружка горячего шоколада.';
+                badge.innerText = 'Пониженный тонус';
+                badge.className = 'px-3 py-1 text-xs font-bold rounded-full bg-blue-500/20 text-blue-400 border border-blue-500/30';
+            } else if (state.currentTemp >= 36.0 && state.currentTemp <= 37.5) {
+                feedback.innerText = '💡 Идеальная температура! Ядро работает в оптимальном режиме.';
+                badge.innerText = 'Норма Шевеления';
+                badge.className = 'px-3 py-1 text-xs font-bold rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30';
+            } else {
+                feedback.innerText = '🔥 Повышенная активность! Внимание: усиленный разгон системы.';
+                badge.innerText = 'Активирован Турбо-Режим';
+                badge.className = 'px-3 py-1 text-xs font-bold rounded-full bg-amber-500/20 text-amber-400 border border-amber-500/30';
+            }
+        }
+
+        // Final Verification Process
+        function completeFinalVerification() {
+            AudioFX.playClick();
+            document.getElementById('btnFinalVerify').classList.add('hidden');
+            const progressBox = document.getElementById('verifyingProgressBox');
+            progressBox.classList.remove('hidden');
+
+            const progressBar = document.getElementById('verifyProgressBar');
+            const progressText = document.getElementById('verifyProgressText');
+
+            const steps = [
+                'Валидация паспорта...',
+                'Тестирование датчика...',
+                'Регистрация ключа в Choco Network...',
+                'Успешно!'
+            ];
+
+            let p = 0;
+            let idx = 0;
+
+            const interval = setInterval(() => {
+                p += 25;
+                progressBar.style.width = `${p}%`;
+                if (steps[idx]) progressText.innerText = steps[idx];
+                AudioFX.playScanBeep();
+                idx++;
+
+                if (p >= 100) {
+                    clearInterval(interval);
+                    state.isVipVerified = true;
+                    AudioFX.playSuccess();
+
+                    // Trigger Confetti Celebration
+                    try {
+                        confetti({
+                            particleCount: 100,
+                            spread: 70,
+                            origin: { y: 0.6 }
+                        });
+                    } catch(e){}
+
+                    document.getElementById('vipBadge').classList.remove('hidden');
+                    showToast('🎉 Вы получили официальный статус Koka Store VIP!');
+
+                    setTimeout(() => {
+                        switchTab('store');
+                    }, 1200);
+                }
+            }, 700);
+        }
+
+        // Choco CLI Terminal Engine
+        function handleTermSubmit(e) {
+            e.preventDefault();
+            const input = document.getElementById('termInput');
+            const cmd = input.value.trim();
+            if(!cmd) return;
+
+            input.value = '';
+            printTermOutput(`choco-croco$&nbsp;${cmd}`, 'text-gold');
+
+            processCommand(cmd.toLowerCase());
+        }
+
+        function printTermOutput(text, colorClass = 'text-muted') {
+            const out = document.getElementById('termOutput');
+            const p = document.createElement('p');
+            p.className = `${colorClass} leading-relaxed`;
+            p.innerHTML = text;
+            out.appendChild(p);
+            out.scrollTop = out.scrollHeight;
+        }
+
+        function processCommand(cmd) {
+            const parts = cmd.split(' ');
+            const main = parts[0];
+
+            switch(main) {
+                case 'help':
+                    printTermOutput('Список команд Choco CLI:');
+                    printTermOutput('  <span class="text-gold font-bold">help</span> — вызов справки');
+                    printTermOutput('  <span class="text-gold font-bold">theme [choco|mokko]</span> — сменить тему оформленя');
+                    printTermOutput('  <span class="text-gold font-bold">check-temp</span> — замер температуры');
+                    printTermOutput('  <span class="text-gold font-bold">pisyun-status</span> — диагностика ядра ОС');
+                    printTermOutput('  <span class="text-gold font-bold">koka-install &lt;app_id&gt;</span> — консольная установка софта');
+                    printTermOutput('  <span class="text-gold font-bold">block-google</span> — заблокировать 100 пакетов Play Market');
+                    printTermOutput('  <span class="text-gold font-bold">clear</span> — очистить терминал');
+                    break;
+
+                case 'theme':
+                    if (parts[1] === 'mokko' || parts[1] === 'choco') {
+                        if (parts[1] !== state.theme) toggleTheme();
+                        printTermOutput(`Тема установлена: ${state.theme}`);
+                    } else {
+                        printTermOutput('Использование: theme choco OR theme mokko', 'text-amber-400');
+                    }
+                    break;
+
+                case 'check-temp':
+                    printTermOutput(`[SENSOR] Температура: <span class="text-gold">${state.currentTemp} °C</span>`);
+                    break;
+
+                case 'pisyun-status':
+                    printTermOutput('[CORE] OS status: ACTIVE & ONLINE');
+                    printTermOutput('[CORE] Версия ядра: 3.0.0-CHOCO-RELEASE');
+                    printTermOutput(`[CORE] Заблокировано шпионов Google: ${state.blockedGoogleCount}`);
+                    break;
+
+                case 'block-google':
+                    state.blockedGoogleCount += 100;
+                    document.getElementById('googleBlockedVal').innerText = `${state.blockedGoogleCount.toLocaleString()} шт.`;
+                    AudioFX.playSuccess();
+                    printTermOutput(`[SHIELD] Уничтожено 100 проприетарных пакетов. Всего заблокировано: ${state.blockedGoogleCount}`, 'text-emerald-400');
+                    break;
+
+                case 'koka-install':
+                    const appId = parts[1];
+                    if(!appId) {
+                        printTermOutput('Укажите ID приложения (например: koka-install shield)', 'text-amber-400');
+                    } else {
+                        const app = state.apps.find(a => a.id === appId);
+                        if(!app) {
+                            printTermOutput(`Приложение "${appId}" не найдено в Кока Стор.`, 'text-red-400');
+                        } else {
+                            installApp(appId);
+                            printTermOutput(`Запущена установка "${app.title}"...`, 'text-emerald-400');
+                        }
+                    }
+                    break;
+
+                case 'clear':
+                    document.getElementById('termOutput').innerHTML = '';
+                    break;
+
+                default:
+                    printTermOutput(`Неизвестная команда "${main}". Введите "help" для списка.`, 'text-red-400');
+            }
+        }
+
+        // Interactive App Modal Preview
+        function launchAppModal(appId) {
+            AudioFX.playClick();
+            const app = state.apps.find(a => a.id === appId);
+            if(!app) return;
+
+            document.getElementById('modalAppTitle').innerText = app.title;
+            document.getElementById('modalAppCategory').innerText = app.categoryName;
+            document.getElementById('modalAppSize').innerText = app.size;
+
+            const iconBox = document.getElementById('modalAppIconBox');
+            iconBox.innerHTML = `<i data-lucide="${app.icon}" class="w-8 h-8"></i>`;
+
+            const area = document.getElementById('modalInteractiveArea');
+
+            // Dynamic Modal Content based on Launched App
+            if (appId === 'scanner') {
+                area.innerHTML = `
+                    <p class="text-xs font-bold text-emerald-400">Кроко-Сканер в работе</p>
+                    <div class="w-full bg-panel p-3 rounded-xl border custom-border text-xs code-font text-muted">
+                        [✓] Google Play Services — NOT FOUND<br/>
+                        [✓] Telemetry Spies — 0 DETECTED<br/>
+                        [✓] Шоколадная безопасность — 100%
+                    </div>
+                `;
+            } else if (appId === 'rectal_pro') {
+                area.innerHTML = `
+                    <p class="text-xs font-bold text-gold">Показания Градусника</p>
+                    <div class="text-3xl font-black code-font text-gold">${state.currentTemp} °C</div>
+                    <p class="text-[11px] text-muted">Статус: Нормальное шевеление ядра</p>
+                `;
+            } else {
+                area.innerHTML = `
+                    <div class="space-y-2">
+                        <p class="text-xs font-bold text-emerald-400">Приложение заложено и готово к использованию</p>
+                        <p class="text-xs text-muted">Версия совместима с ядром OS.</p>
+                    </div>
+                `;
+            }
+
+            document.getElementById('appModal').classList.remove('hidden');
+            lucide.createIcons();
+        }
+
+        function closeAppModal() {
+            AudioFX.playClick();
+            document.getElementById('appModal').classList.add('hidden');
+        }
+
+        // Toast Notification System
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `pointer-events-auto flex items-center space-x-2 px-4 py-3 rounded-2xl shadow-2xl border text-xs font-bold animate-fadeIn transition-all transform hover:scale-105 duration-300 ${
+                type === 'error' ? 'bg-red-900/90 text-white border-red-500' : 'bg-panel-elevated text-gold border-amber-500/40'
+            }`;
+
+            toast.innerHTML = `
+                <i data-lucide="${type === 'error' ? 'alert-triangle' : 'info'}" class="w-4 h-4"></i>
+                <span>${message}</span>
+            `;
+
+            container.appendChild(toast);
+            lucide.createIcons();
+
+            setTimeout(() => {
+                toast.classList.add('opacity-0', 'translate-y-2');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        // Live Telemetry Loop
+        setInterval(() => {
+            // Fluctuate CPU usage slightly
+            state.cpuUsage = Math.floor(35 + Math.random() * 20);
+            const cpuVal = document.getElementById('cpuUsageVal');
+            const cpuBar = document.getElementById('cpuProgressBar');
+            if (cpuVal) cpuVal.innerText = `${state.cpuUsage}%`;
+            if (cpuBar) cpuBar.style.width = `${state.cpuUsage}%`;
+
+            // Increment google block counter occasionally
+            if (Math.random() > 0.6) {
+                state.blockedGoogleCount += Math.floor(Math.random() * 3) + 1;
+                const blockedVal = document.getElementById('googleBlockedVal');
+                if (blockedVal) blockedVal.innerText = `${state.blockedGoogleCount.toLocaleString()} шт.`;
+            }
+        }, 3000);
+
+        // Initial Load Event
+        window.onload = function() {
+            lucide.createIcons();
+            renderStoreApps();
+            console.log('Choco Croco OS initialized successfully.');
+        };
+    </script>
+</body>
+</html>
